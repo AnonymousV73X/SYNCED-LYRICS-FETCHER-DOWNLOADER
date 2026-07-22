@@ -328,6 +328,10 @@ svg { display: inline-block; max-width: 100%; max-height: 100%; }
   border-radius: 12px;
   padding: 16px;
   cursor: pointer;
+  touch-action: manipulation;          /* removes iOS 300ms tap delay */
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
   transition: border-color 0.12s ease, transform 0.12s ease, box-shadow 0.12s ease;
   position: relative;
   overflow: hidden;

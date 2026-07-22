@@ -422,12 +422,34 @@
     resultsEl.appendChild(frag);
 
     // Event delegation — single listener on the grid, O(1) lookup
-    resultsEl.onclick = (e) => {
+    function handleCardActivate(e) {
       const card = e.target.closest(".result-card");
       if (!card) return;
       const record = _lastRecords.get(card.dataset.id);
       if (record) openLyricsModal(record);
-    };
+    }
+
+    resultsEl.onclick = handleCardActivate;
+
+    // iOS Safari: touchend fires more reliably than click on non-button elements
+    let _touchStartY = 0;
+    let _touchMoved = false;
+    resultsEl.addEventListener("touchstart", (e) => {
+      _touchStartY = e.touches[0].clientY;
+      _touchMoved = false;
+    }, { passive: true });
+    resultsEl.addEventListener("touchmove", (e) => {
+      if (Math.abs(e.touches[0].clientY - _touchStartY) > 10) _touchMoved = true;
+    }, { passive: true });
+    resultsEl.addEventListener("touchend", (e) => {
+      if (_touchMoved) return;          // user was scrolling, not tapping
+      const card = e.target.closest(".result-card");
+      if (!card) return;
+      e.preventDefault();              // prevents the ghost click 300ms later
+      const record = _lastRecords.get(card.dataset.id);
+      if (record) openLyricsModal(record);
+    });
+
     resultsEl.addEventListener(
       "mouseover",
       (e) => {
